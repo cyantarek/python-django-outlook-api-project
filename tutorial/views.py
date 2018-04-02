@@ -8,8 +8,13 @@ import json
 
 
 def home(request):
-	auth_url = get_auth_url()
-	context = {"signin_url": auth_url}
+	try:
+		user_email = request.session["user_mail"]
+		user = user_email.split("@")[0]
+		context = {"message": "Thanks {0} for signing up. Enjoy the app".format(user)}
+	except KeyError:
+		auth_url = get_auth_url()
+		context = {"signin_url": auth_url}
 	return render(request, "home.html", context)
 
 def api_work(request):
@@ -19,31 +24,32 @@ def api_work(request):
 	user = get_user(token_code)
 	with open("token.json", "w") as f:
 		json.dump({"token": token_code}, f)
-	user_mail = user["mail"]
-	request.session["user_mail"] = user_mail
-	return HttpResponseRedirect(reverse("mail"))
-
-def mail(request):
-	with open("token.json", "r") as f:
-		jsn = json.load(f)
-		token = jsn["token"]
-
-	token = request.session["token"]
 	user_email = request.session["user_mail"]
-	messages = get_user_messages(token=token, user_email=user_email)
-	with open("response.json", "w") as f:
-		json.dump(messages, f)
-	context = {"messages": messages["value"], "mail": user_email}
-	# return HttpResponse("Messages: {0}".format(messages))
+	request.session["user_mail"] = user_email
+	return HttpResponseRedirect(reverse("home"))
+
+def mail_view(request):
+	try:
+		with open("token.json", "r") as f:
+			jsn = json.load(f)
+			token = jsn["token"]
+		token = request.session["token"]
+		user_email = request.session["user_mail"]
+		messages = get_user_messages(token=token, user_email=user_email)
+		context = {"messages": messages["value"], "mail": user_email}
+	except KeyError:
+		context = {"error_message": "Please signup to outlook before viewing your emails"}
 	return render(request, "mail.html", context)
 
-def events(request):
-	with open("token.json", "r") as f:
-		jsn = json.load(f)
-		token = jsn["token"]
-
-	token = request.session["token"]
-	user_email = request.session["user_mail"]
-	events = get_user_events(token, user_email)
-	context = {"events": events["value"],}
+def events_view(request):
+	try:
+		with open("token.json", "r") as f:
+			jsn = json.load(f)
+			token = jsn["token"]
+		token = request.session["token"]
+		user_email = request.session["user_mail"]
+		events = get_user_events(token, user_email)
+		context = {"events": events["value"], }
+	except KeyError:
+		context = {"error_message": "Please signup to outlook before viewing your events"}
 	return render(request, "event.html", context)

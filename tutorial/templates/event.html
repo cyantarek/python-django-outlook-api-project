@@ -1,19 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>Your Events</h1>
-    <table class="table">
-        <tr>
-            <th>Subject</th>
-            <th>Start</th>
-            <th>End</th>
-        </tr>
-
-        {% for event in events %}
+    <div class="jumbotron">
+    {% if error_message %}
+        <h1>{{ error_message }}</h1>
+        <a class="btn btn-lg btn-primary" href="{{ signin_url }}" role="button" id="connect-button">Connect to
+                                                                                                    Outlook</a>
+    {% else %}
+        <h1>Your Events</h1>
+        <table class="table">
             <tr>
-                <td>{{ event.subject }}</td>
-                <td>{{ event.start.dateTime }} ({{ event.start.timeZone }})</td>
-                <td>{{ event.end.dateTime }} ({{ event.end.timeZone }})</td>
+                <th>Subject</th>
+                <th>Start</th>
+                <th>End</th>
             </tr>
-        {% endfor %}
-    </table>
+
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.subject }}</td>
+                    <td>{{ event.start.dateTime }} ({{ event.start.timeZone }})</td>
+                    <td>{{ event.end.dateTime }} ({{ event.end.timeZone }})</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    </div>
 {% endblock %}

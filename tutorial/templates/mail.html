@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
+<div class="jumbotron">
+    {% if error_message %}
+        <h1>{{ error_message }}</h1>
+        <a class="btn btn-lg btn-primary" href="{{ signin_url }}" role="button" id="connect-button">Connect to
+                                                                                                    Outlook</a>
+    {% else %}
     <h1>Your Email <i style="font-size: medium">{{ mail }}</i></h1>
     <table class="table">
         <tr>
@@ -16,4 +22,6 @@
             </tr>
         {% endfor %}
     </table>
+    {% endif %}
+</div>
 {% endblock %}
